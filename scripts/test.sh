@@ -16,4 +16,3 @@ if [ $? -eq 0 ]; then
 else
   echo "Testing failed. Check test.log for more information."
 fi
-
