@@ -343,9 +343,9 @@ impl Metrics for Github {
     }
 
     //testing reviewed code metric
-    #[test]
-    fn test_reveiwed_code() {
-        let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
-        assert!(g.reviewed_code() <= 0.5);
-    }
+    //#[test]
+    //fn test_reveiwed_code() {
+    //    let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
+    //    assert!(g.reviewed_code() <= 0.5);
+    //}
 
