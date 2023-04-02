@@ -68,6 +68,10 @@ impl Metrics for Npm {
     fn compatibility(&self) -> f64 {
         self.gh.compatibility()
     }
+
+    fn pinning_practice(&self) -> f64 {
+        self.gh.pinning_practice()
+    }
 }
 
 #[cfg(test)]
@@ -98,7 +102,9 @@ mod tests {
             n.correctness(),
             n.bus_factor(),
             n.responsiveness(),
-            n.compatibility()
+            n.compatibility(),
+            n.reviewed_code(),
+            n.pinning_practice()
         );
     }
 }
