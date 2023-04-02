@@ -21,9 +21,9 @@ jobs:
     - name: Build
       run: cargo build --verbose
     - name: Run 
-      run: run --cli
+      run: cargo run --verbose
     - name: Tests
-      run: cargo test --verbose --run cli
+      run: cargo test --verbose
 
   run-lint:
     runs-on: ubuntu-latest
