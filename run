@@ -1,0 +1,120 @@
+#!/usr/bin/env bash
+
+# exit on error
+set -e
+
+EXE="./target/debug/ece461_team19_cli"
+RELEASE_EXE="./target/release/ece461_team19_cli"
+
+# check for existing llvm tools
+if [ -x "$(command -v llvm-cov-14)" ]; then
+    LLVM_COV="llvm-cov-14"
+else
+    LLVM_COV="rust-cov"
+fi
+if [ -x "$(command -v llvm-profdata-14)" ]; then
+    LLVM_PROFDATA="llvm-profdata-14"
+else
+    LLVM_PROFDATA="rust-profdata"
+fi
+
+if [[ "$1" == "build" ]]; then
+    if [[ -f .IS_ECEPROG ]]; then
+        . ~/.cargo/env
+    fi
+
+    # build program
+    cargo build --release
+elif [[ "$1" == "install" ]]; then
+    # install newer rust
+    if ! [ -x "$(command -v rustup)" ]; then
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > rustup_install.sh
+	bash rustup_install.sh -y --no-modify-path
+	source ~/.cargo/env
+	rm -f rustup_install.sh
+	touch .IS_ECEPROG
+    fi
+
+    # install test dependencies
+    if ! [ -x "$(command -v llvm-profdata-14)" ]; then
+        rustup component add llvm-tools-preview
+        cargo install cargo-binutils
+    fi
+elif [[ "$1" == "test" ]]; then
+    if [[ -f .IS_ECEPROG ]]; then
+        . ~/.cargo/env
+    fi
+
+    # check for github token
+    if [[ "$GITHUB_TOKEN" == "" ]]; then
+        echo "Please supply \$GITHUB_TOKEN for the correct test result"
+        exit
+    fi
+
+    # remove files of previous tests
+    rm -f *.profraw
+    rm -f *.profdata
+    rm -f cargo_test.out
+    rm -f test_exes.txt
+    rm -f test_result.out
+    rm -f test_result.temp
+    rm -f line_result.out
+    rm -rf ./test_target
+
+    # run tests
+    RUSTFLAGS="-C instrument-coverage" cargo build --target-dir="test_target"
+    RUSTFLAGS="-C instrument-coverage" cargo test --tests --message-format=json --no-run ece461_team19_cli > cargo_test.out
+    grep '"executable":".*/deps/' cargo_test.out | sed 's/.*"executable":"\([^"]*\)".*/\1/' > test_exes.txt
+    while IFS="" read -r line
+    do
+        "$line" --logfile=./test_result.temp
+        cat ./test_result.temp >> ./test_result.out
+    done < test_exes.txt
+
+    # merge coverage data
+    "$LLVM_PROFDATA" merge -sparse *.profraw -o line_result.profdata
+
+    # process test result
+    if [[ "$2" == "show" ]]; then
+        "$LLVM_COV" show -Xdemangler=rustfilt \
+            $(while IFS="" read -r line; \
+                do \
+                    printf "%s %s " "--object" $line; \
+                done < test_exes.txt \
+            ) \
+            --object ./test_target/debug/ece461_team19_cli \
+            --instr-profile=line_result.profdata \
+            --ignore-filename-regex=/.cargo/registry \
+            --ignore-filename-regex=/rustc
+    fi
+
+    "$LLVM_COV" export -format=text -summary-only \
+        $(while IFS="" read -r line; \
+            do \
+                printf "%s %s " "--object" $line; \
+            done < test_exes.txt \
+        ) \
+        --object ./test_target/debug/ece461_team19_cli \
+        --instr-profile=line_result.profdata \
+        --ignore-filename-regex=/.cargo/registry \
+        --ignore-filename-regex=/rustc \
+        > ./line_result.out
+
+    "$EXE" report ./test_result.out ./line_result.out
+
+    rm -f *.profraw
+    rm -f *.profdata
+    rm -f cargo_test.out
+    rm -f test_exes.txt
+    rm -f test_result.out
+    rm -f test_result.temp
+    rm -f line_result.out
+    rm -rf ./test_target
+else
+    if [[ -f .IS_ECEPROG ]]; then
+        . ~/.cargo/env
+    fi
+
+    # parse url file
+    "$RELEASE_EXE" url $1
+fi

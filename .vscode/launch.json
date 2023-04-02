@@ -1,0 +1,65 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'ece461_team19_cli'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=ece461_team19_cli",
+                    "--package=ece461_team19_cli"
+                ],
+                "filter": {
+                    "name": "ece461_team19_cli",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'ece461_team19_cli'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=ece461_team19_cli",
+                    "--package=ece461_team19_cli"
+                ],
+                "filter": {
+                    "name": "ece461_team19_cli",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug integration test 'cli'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--test=cli",
+                    "--package=ece461_team19_cli"
+                ],
+                "filter": {
+                    "name": "cli",
+                    "kind": "test"
+                }
+            },
+            "args": [
+                "tests/url.txt"
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {
+            }
+        }
+    ]
+}

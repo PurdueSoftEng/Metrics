@@ -1,0 +1,62 @@
+[2023-02-12T19:46:04Z INFO  ece461_team19_cli] print info
+[2023-02-12T19:46:04Z DEBUG ece461_team19_cli] print debug
+[2023-02-12T19:46:04Z INFO  ece461_team19_cli] exploring https://github.com/nodeca/js-yaml
+[2023-02-12T19:46:04Z INFO  ece461_team19_cli] calculating score
+[2023-02-12T19:46:04Z INFO  ece461_team19_cli::metrics::github] cloning repository from https://github.com/nodeca/js-yaml
+[2023-02-12T19:46:07Z INFO  ece461_team19_cli::metrics::github] repository cloned
+[2023-02-12T19:46:07Z INFO  ece461_team19_cli::metrics::github] calculating ramp_up_score
+[2023-02-12T19:46:07Z DEBUG ece461_team19_cli::metrics::github] ramp_up_score: 0.84
+[2023-02-12T19:46:07Z INFO  ece461_team19_cli::metrics::github] repository deleted
+[2023-02-12T19:46:07Z INFO  ece461_team19_cli::metrics::github] calculating correctness_score
+[2023-02-12T19:46:07Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:07Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:07Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:08Z DEBUG ece461_team19_cli::metrics::github] correctness_score: 0.93
+[2023-02-12T19:46:08Z INFO  ece461_team19_cli::metrics::github] calculating bus_factor_score
+[2023-02-12T19:46:08Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:08Z DEBUG ece461_team19_cli::metrics::github] bus_factor_score: 0.97
+[2023-02-12T19:46:08Z INFO  ece461_team19_cli::metrics::github] calculating responsive_maintainer_score
+[2023-02-12T19:46:08Z DEBUG ece461_team19_cli::metrics::github] responsive_maintainer_score: 0.20
+[2023-02-12T19:46:08Z INFO  ece461_team19_cli::metrics::github] calculating license_score
+[2023-02-12T19:46:08Z DEBUG ece461_team19_cli::metrics::github] license_score: 1.00
+[2023-02-12T19:46:08Z INFO  ece461_team19_cli] exploring https://www.npmjs.com/package/qs
+[2023-02-12T19:46:08Z DEBUG reqwest::connect] starting new connection: https://registry.npmjs.org/
+[2023-02-12T19:46:08Z INFO  ece461_team19_cli] calculating score
+[2023-02-12T19:46:08Z INFO  ece461_team19_cli::metrics::github] cloning repository from https://github.com/ljharb/qs
+[2023-02-12T19:46:09Z INFO  ece461_team19_cli::metrics::github] repository cloned
+[2023-02-12T19:46:09Z INFO  ece461_team19_cli::metrics::github] calculating ramp_up_score
+[2023-02-12T19:46:09Z DEBUG ece461_team19_cli::metrics::github] ramp_up_score: 0.02
+[2023-02-12T19:46:09Z INFO  ece461_team19_cli::metrics::github] repository deleted
+[2023-02-12T19:46:09Z INFO  ece461_team19_cli::metrics::github] calculating correctness_score
+[2023-02-12T19:46:09Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:10Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:10Z DEBUG ece461_team19_cli::metrics::github] correctness_score: 0.82
+[2023-02-12T19:46:10Z INFO  ece461_team19_cli::metrics::github] calculating bus_factor_score
+[2023-02-12T19:46:10Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:10Z DEBUG ece461_team19_cli::metrics::github] bus_factor_score: 0.96
+[2023-02-12T19:46:10Z INFO  ece461_team19_cli::metrics::github] calculating responsive_maintainer_score
+[2023-02-12T19:46:10Z DEBUG ece461_team19_cli::metrics::github] responsive_maintainer_score: 0.10
+[2023-02-12T19:46:10Z INFO  ece461_team19_cli::metrics::github] calculating license_score
+[2023-02-12T19:46:11Z DEBUG ece461_team19_cli::metrics::github] license_score: 1.00
+[2023-02-12T19:46:11Z INFO  ece461_team19_cli] exploring https://github.com/brix/crypto-js
+[2023-02-12T19:46:11Z INFO  ece461_team19_cli] calculating score
+[2023-02-12T19:46:11Z INFO  ece461_team19_cli::metrics::github] cloning repository from https://github.com/brix/crypto-js
+[2023-02-12T19:46:13Z INFO  ece461_team19_cli::metrics::github] repository cloned
+[2023-02-12T19:46:13Z INFO  ece461_team19_cli::metrics::github] calculating ramp_up_score
+[2023-02-12T19:46:13Z DEBUG ece461_team19_cli::metrics::github] ramp_up_score: 0.80
+[2023-02-12T19:46:13Z INFO  ece461_team19_cli::metrics::github] repository deleted
+[2023-02-12T19:46:13Z INFO  ece461_team19_cli::metrics::github] calculating correctness_score
+[2023-02-12T19:46:13Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:14Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:14Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:14Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:14Z DEBUG ece461_team19_cli::metrics::github] correctness_score: 0.38
+[2023-02-12T19:46:14Z INFO  ece461_team19_cli::metrics::github] calculating bus_factor_score
+[2023-02-12T19:46:14Z DEBUG reqwest::connect] starting new connection: https://api.github.com/
+[2023-02-12T19:46:15Z DEBUG ece461_team19_cli::metrics::github] bus_factor_score: 0.92
+[2023-02-12T19:46:15Z INFO  ece461_team19_cli::metrics::github] calculating responsive_maintainer_score
+[2023-02-12T19:46:15Z DEBUG ece461_team19_cli::metrics::github] responsive_maintainer_score: 0.10
+[2023-02-12T19:46:15Z INFO  ece461_team19_cli::metrics::github] calculating license_score
+[2023-02-12T19:46:15Z DEBUG ece461_team19_cli::metrics::github] license_score: 0.00
+[2023-02-12T19:46:15Z INFO  ece461_team19_cli] sorting by net scores
+[2023-02-12T19:46:15Z INFO  ece461_team19_cli] generating output

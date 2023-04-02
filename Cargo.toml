@@ -1,0 +1,18 @@
+[package]
+name = "ece461_team19_cli"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+env_logger = "0.10.0"
+log = "0.4.17"
+reqwest = { version = "0.11.14", features = ["blocking", "json"] }
+serde_json = "1.0.91"
+git2 = "0.16.1"
+statrs = "0.16.0"
+chrono = "0.4.23"
+assert_cmd = "2.0.8"
+clap = { version = "4.1.4", features = ["derive"] }
+

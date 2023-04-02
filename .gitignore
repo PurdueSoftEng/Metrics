@@ -1,0 +1,7 @@
+/target
+/test_target
+/cloned_*
+/*.out
+/*.profraw
+/*.profdata
+/.IS_ECEPROG
