@@ -23,7 +23,7 @@ jobs:
     - name: Run 
       run: run --cli
     - name: Tests
-      run: cargo test --verbose
+      run: cargo test --verbose --run cli
 
   run-lint:
     runs-on: ubuntu-latest
