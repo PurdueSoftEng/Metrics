@@ -4,7 +4,9 @@ use log::{debug, info};
 use reqwest::header;
 use statrs::distribution::{ContinuousCDF, Normal};
 use std::io::BufRead;
-
+use pyo3::{prelude::*, types::PyMapping};
+use pyo3::types::PyDict;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug)]
 pub struct Github {
@@ -15,6 +17,39 @@ pub struct Github {
 
     // API-related
     client: reqwest::blocking::Client,
+}
+
+#[derive(Debug, Deserialize)]
+struct GithubPinningPractice {
+    url: String,
+    name: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct PinningPracticePackageJSON {
+    name: String,
+    path: String,
+    sha: String,
+    size: u64,
+    url: String,
+    html_url: String,
+    git_url: String,
+    download_url: String,
+    #[serde(rename = "type")]
+    file_type: String,
+    content: Option<String>,
+    encoding: String, 
+    _links: Links,
+}
+
+#[derive(Debug, Deserialize)]
+struct Links {
+    #[serde(rename = "self")]
+    self_link: String,
+    #[serde(rename = "html")]
+    html_link: String,
+    #[serde(rename = "git")]
+    git_link: String,
 }
 
 impl Github {
@@ -248,6 +283,75 @@ impl Metrics for Github {
         reviewed_code_score as f64
     }
 
+    fn pinning_practice(&self) -> f64 {
+        // use github api to get dependency count
+        info!("calculating pinning_practice_score");
+
+        let response = self.rest_json("contents").unwrap(); 
+        let response_str = serde_json::to_string(&response).unwrap();
+        let contents: Vec<GithubPinningPractice> = serde_json::from_str(&response_str).unwrap();
+
+        let mut package_url = String::new();
+        for content in contents {
+            if content.name == "package.json" {
+                package_url = content.url; 
+            } 
+        }
+        // ADD IN BAD REQUEST HERE
+
+        let client = reqwest::blocking::Client::builder()
+            .user_agent("ECE461Project")
+            .build();
+        let response = client.unwrap().get(package_url).send();
+
+        let mut num_dependencies = 0.0;
+        if let Some(response) = response.ok() {
+            let body_string = response.text().unwrap();
+            let body_json_string: PinningPracticePackageJSON = serde_json::from_str(&body_string).unwrap();
+            let content_string = body_json_string.content.unwrap();
+            let trimmed_content_string = content_string.trim_matches('\n').to_string();
+            
+            pyo3::prepare_freethreaded_python();
+            Python::with_gil(|py| {
+                let base64_module = py.import("base64").unwrap();
+                let base64_decode_fn = base64_module.getattr("b64decode").unwrap();
+
+                let decoded_content_bytes = base64_decode_fn.call1((trimmed_content_string,)).unwrap().extract::<Vec<u8>>().unwrap();
+                let decoded_content_string = String::from_utf8(decoded_content_bytes).unwrap();
+                
+                // error fixing -- edit string to devDependencies
+                let mut edited_decoded_content_string = String::new();
+                edited_decoded_content_string.push('{');
+                let mut word_check = 0;
+                for word in decoded_content_string.split_whitespace() {
+                    if word == "\"devDependencies\":" {
+                        word_check = 1;
+                    }
+                    if word_check == 1 {
+                        for c in word.chars() {
+                            edited_decoded_content_string.push(c);
+                        }
+                        edited_decoded_content_string.push(' ');
+                    }
+                }
+
+                //let mut decoded_content_dict = PyDict::new(py);
+                //let dictionary_obj = py.eval(&edited_decoded_content_string, None, None).unwrap();
+                //let dictionary_py = dictionary_obj.extract::<&PyDict>().unwrap();
+
+                let dict_py_json: serde_json::Value = serde_json::from_str(&edited_decoded_content_string).unwrap();
+                let dev_dependencies = dict_py_json["devDependencies"].as_object().unwrap();
+                let dev_dependencies_vals = dev_dependencies.values().cloned().collect::<Vec<_>>();
+                num_dependencies = dev_dependencies_vals.len() as f64;
+            }); 
+        } else {
+            num_dependencies = 0.0;
+        }
+
+        let pinning_practice_score = if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}; 
+
+        pinning_practice_score
+    }
 }
 
     // testing ramp_up_time
@@ -342,10 +446,22 @@ impl Metrics for Github {
         assert!(g.compatibility() == 0.0);
     }
 
-    //testing reviewed code metric
-    //#[test]
-    //fn test_reveiwed_code() {
-    //    let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
-    //    assert!(g.reviewed_code() <= 0.5);
-    //}
+    // //testing reviewed code metric
+    // #[test]
+    // fn test_reveiwed_code() {
+    //     let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
+    //     assert!(g.reviewed_code() <= 0.5);
+    // }
+
+    // #[test]
+    // fn pinning_one_half() {
+    //     let g = Github::with_url("https://github.com/nodeca/js-yaml").unwrap();
+    //     assert!(g.responsiveness() == 0.5);
+    // }
+
+    // #[test]
+    // fn pinning_zero() {
+    //     let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
+    //     assert!(g.responsiveness() == 1.0);
+    // }
 
