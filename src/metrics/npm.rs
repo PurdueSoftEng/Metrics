@@ -97,7 +97,7 @@ mod tests {
     fn test_metrics() {
         let n = Npm::with_url("https://www.npmjs.com/package/js-yaml").unwrap();
         println!(
-            "{} {} {} {} {}",
+            "{} {} {} {} {} {} {}",
             n.ramp_up_time(),
             n.correctness(),
             n.bus_factor(),
