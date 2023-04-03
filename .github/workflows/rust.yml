@@ -32,6 +32,14 @@ jobs:
           # Full git history is needed to get a proper list of changed files within `super-linter`
           fetch-depth: 0
 
+      # Conditional check to run lint only when pull request is made against master branch
+      - name: Check pull request branch
+        run: |
+          if [ ${{ github.event_name }} == 'pull_request' ] && [ "${{ github.head_ref }}" != "master" ]; then
+            echo "Linting skipped for branch ${{ github.head_ref }}";
+            exit 0;
+          fi
+
       - name: Lint Code Base
         uses: github/super-linter@v4
         env:
