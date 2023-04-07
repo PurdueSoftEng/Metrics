@@ -19,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build
-      run: ./run install
+      run: bash run install
     - name: Tests
       run: ./run build
 
