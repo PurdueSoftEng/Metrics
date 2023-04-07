@@ -265,23 +265,40 @@ impl Metrics for Github {
         info!("calculating reviewed_code_score");
 
         let json = self.graph_json(
-            format!("{{\"query\" : \"query {{ repository(owner: \\\"{}\\\", name: \\\"{}\\\") {{ pullRequests(states: [OPEN, CLOSED], first: 100, orderBy: {{field: CREATED_AT, direction: DESC}}) {{ edges {{ node {{ number additions, number deletions, reviews(first: 1) {{ totalCount }} }} }} }} }} }}\" }}", self.owner, self.repo))
-            .unwrap();
+            format!(
+                "{{\"query\":\"query {{ repository(owner: \\\"{}\\\", name: \\\"{}\\\") {{ pullRequests(first: 100, orderBy: {{field: CREATED_AT, direction: DESC}}) {{ edges {{ node {{ number additions, number deletions }} }} }} }} }}\" }}",
+                self.owner, self.repo
+            )
+        ).unwrap();
 
-        let mut reviewed_pull_count = 0;
         let pulls = json["data"]["repository"]["pullRequests"]["edges"].as_array().unwrap();
+        //println!("numpulls = {}", pulls.len());
 
-        for pull in pulls {
-            let reviews = &pull["node"]["reviews"]["totalCount"];
-            reviewed_pull_count += 1;
+        let reviewsjson = self.graph_json(
+            format!(
+                "{{\"query\":\"query {{ repository(owner: \\\"{}\\\", name: \\\"{}\\\") {{ pullRequests(first: 100, orderBy: {{field: CREATED_AT, direction: DESC}}) {{ edges {{ node {{ number additions, number deletions, reviews(first: 1) {{ totalCount }} }} }} }} }} }}\" }}",
+                self.owner, self.repo
+            )
+        ).unwrap();
+
+        let reviewed_pulls = reviewsjson["data"]["repository"]["pullRequests"]["edges"].as_array().unwrap();
+
+        let mut reviewed_pulls_count = 0;
+
+        for pull in reviewed_pulls {
+            //println!("pull = {}", pull);
+            let reviews = pull["node"]["reviews"]["totalCount"].as_i64();
+            if reviews.unwrap_or(0) > 0 {
+                reviewed_pulls_count += 1;
+            }
         }
+        
+        let reviewed_code_score = reviewed_pulls_count as f64 / pulls.len() as f64;
+        //println!("reviewed code score = {}", reviewed_code_score);
 
-        let reviewed_code_score = reviewed_pull_count / pulls.len();
-        // println!("numpulls = {}", pulls.len());
-        // println!("numreviewed = {}", reviewed_pull_count);
-        // println!("reviewed code score = {}", reviewed_code_score);
-        reviewed_code_score as f64
+        reviewed_code_score
     }
+
 
     fn pinning_practice(&self) -> f64 {
         // use github api to get dependency count
