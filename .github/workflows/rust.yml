@@ -12,6 +12,9 @@ env:
   RUST_BACKTRACE: 1
   LOG_FILE: log/logfile.txt
   LOG_LEVEL: 1
+  VALIDATE_ALL_CODEBASE: false
+  VALIDATE_RUST_2021: True
+  DEFAULT_BRANCH: "master"
 
 jobs:
   build:
@@ -44,7 +47,3 @@ jobs:
 
       - name: Lint Code Base
         uses: github/super-linter@v4
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: "master"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
