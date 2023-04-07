@@ -18,10 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Build
+    - name: Install
       run: bash run install
-    - name: Tests
-      run: cargo test --verbose
+    - name: Build
+      run: bash run build
+    - name: Test
+      run: bash run test
 
   run-lint:
     runs-on: ubuntu-latest
