@@ -4,9 +4,8 @@ use log::{debug, info};
 use reqwest::header;
 use statrs::distribution::{ContinuousCDF, Normal};
 use std::io::BufRead;
-use pyo3::{prelude::*, types::PyMapping};
-use pyo3::types::PyDict;
-use serde::{Deserialize, Serialize};
+use pyo3::{prelude::*};
+use serde::{Deserialize};
 
 #[derive(Debug)]
 pub struct Github {
@@ -27,18 +26,18 @@ struct GithubPinningPractice {
 
 #[derive(Debug, Deserialize)]
 struct PinningPracticePackageJSON {
-    name: String,
-    path: String,
-    sha: String,
-    size: u64,
-    url: String,
-    html_url: String,
-    git_url: String,
-    download_url: String,
+    // name: String,
+    // path: String,
+    // sha: String,
+    // size: u64,
+    // url: String,
+    // html_url: String,
+    // git_url: String,
+    // download_url: String,
     #[serde(rename = "type")]
-    file_type: String,
+    // file_type: String,
     content: Option<String>,
-    encoding: String, 
+    // encoding: String, 
     _links: Links,
 }
 
