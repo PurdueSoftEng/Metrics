@@ -301,73 +301,73 @@ impl Metrics for Github {
 
 
     fn pinning_practice(&self) -> f64 {
-        // use github api to get dependency count
-        info!("calculating pinning_practice_score");
-
-        let response = self.rest_json("contents").unwrap(); 
-        let response_str = serde_json::to_string(&response).unwrap();
-        let contents: Vec<GithubPinningPractice> = serde_json::from_str(&response_str).unwrap();
-
-        let mut package_url = String::new();
-        for content in contents {
-            if content.name == "package.json" {
-                package_url = content.url; 
-            } 
-        }
-        // ADD IN BAD REQUEST HERE
-
-        let client = reqwest::blocking::Client::builder()
-            .user_agent("ECE461Project")
-            .build();
-        let response = client.unwrap().get(package_url).send();
-
-        let mut num_dependencies = 0.0;
-        if let Some(response) = response.ok() {
-            let body_string = response.text().unwrap();
-            let body_json_string: PinningPracticePackageJSON = serde_json::from_str(&body_string).unwrap();
-            let content_string = body_json_string.content.unwrap();
-            let trimmed_content_string = content_string.trim_matches('\n').to_string();
-            
-            pyo3::prepare_freethreaded_python();
-            Python::with_gil(|py| {
-                let base64_module = py.import("base64").unwrap();
-                let base64_decode_fn = base64_module.getattr("b64decode").unwrap();
-
-                let decoded_content_bytes = base64_decode_fn.call1((trimmed_content_string,)).unwrap().extract::<Vec<u8>>().unwrap();
-                let decoded_content_string = String::from_utf8(decoded_content_bytes).unwrap();
+        fn pinning_practice(&self) -> f64 {
+            // use github api to get dependency count
+            info!("calculating pinning_practice_score");
+    
+            let response = self.rest_json("contents").unwrap(); 
+            let response_str = serde_json::to_string(&response).unwrap();
+            let contents: Vec<GithubPinningPractice> = serde_json::from_str(&response_str).unwrap();
+    
+            let mut package_url = String::new();
+            for content in contents {
+                if content.name == "package.json" {
+                    package_url = content.url; 
+                } 
+            }
+    
+            let mut num_dependencies = 0.0;
+            let mut pinning_practice_score = 0.0;  
+            if package_url.is_empty() {
+                pinning_practice_score = 0.0; // No package.json file (for API, if the pinning_practice_score is 0 then 400 Bad Request)
+            } else {
+                let client = reqwest::blocking::Client::builder()
+                .user_agent("ECE461Project")
+                .build();
+            let response = client.unwrap().get(package_url).send();
+    
+            if let Some(response) = response.ok() {
+                let body_string = response.text().unwrap();
+                let body_json_string: PinningPracticePackageJSON = serde_json::from_str(&body_string).unwrap();
+                let content_string = body_json_string.content.unwrap();
+                let trimmed_content_string = content_string.trim_matches('\n').to_string();
                 
-                // error fixing -- edit string to devDependencies
-                let mut edited_decoded_content_string = String::new();
-                edited_decoded_content_string.push('{');
-                let mut word_check = 0;
-                for word in decoded_content_string.split_whitespace() {
-                    if word == "\"devDependencies\":" {
-                        word_check = 1;
-                    }
-                    if word_check == 1 {
-                        for c in word.chars() {
-                            edited_decoded_content_string.push(c);
+                pyo3::prepare_freethreaded_python();
+                Python::with_gil(|py| {
+                    let base64_module = py.import("base64").unwrap();
+                    let base64_decode_fn = base64_module.getattr("b64decode").unwrap();
+    
+                    let decoded_content_bytes = base64_decode_fn.call1((trimmed_content_string,)).unwrap().extract::<Vec<u8>>().unwrap();
+                    let decoded_content_string = String::from_utf8(decoded_content_bytes).unwrap();
+                    
+                    // error fixing -- edit string to devDependencies
+                    let mut edited_decoded_content_string = String::new();
+                    edited_decoded_content_string.push('{');
+                    let mut word_check = 0;
+                    for word in decoded_content_string.split_whitespace() {
+                        if word == "\"devDependencies\":" {
+                            word_check = 1;
                         }
-                        edited_decoded_content_string.push(' ');
+                        if word_check == 1 {
+                            for c in word.chars() {
+                                edited_decoded_content_string.push(c);
+                            }
+                            edited_decoded_content_string.push(' ');
+                        }
                     }
-                }
-
-                //let mut decoded_content_dict = PyDict::new(py);
-                //let dictionary_obj = py.eval(&edited_decoded_content_string, None, None).unwrap();
-                //let dictionary_py = dictionary_obj.extract::<&PyDict>().unwrap();
-
-                let dict_py_json: serde_json::Value = serde_json::from_str(&edited_decoded_content_string).unwrap();
-                let dev_dependencies = dict_py_json["devDependencies"].as_object().unwrap();
-                let dev_dependencies_vals = dev_dependencies.values().cloned().collect::<Vec<_>>();
-                num_dependencies = dev_dependencies_vals.len() as f64;
-            }); 
-        } else {
-            num_dependencies = 0.0;
+    
+                    let dict_py_json: serde_json::Value = serde_json::from_str(&edited_decoded_content_string).unwrap();
+                    let dev_dependencies = dict_py_json["devDependencies"].as_object().unwrap();
+                    let dev_dependencies_vals = dev_dependencies.values().cloned().collect::<Vec<_>>();
+                    num_dependencies = dev_dependencies_vals.len() as f64;
+                }); 
+    
+                pinning_practice_score = if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies};
+            }
+            } 
+    
+            pinning_practice_score
         }
-
-        let pinning_practice_score = if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}; 
-
-        pinning_practice_score
     }
 }
 
