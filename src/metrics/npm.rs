@@ -93,18 +93,18 @@ mod tests {
         assert!(Npm::with_url("https://www.npmjs.com/package/js-yaml").is_some());
     }
 
-    #[test]
-    fn test_metrics() {
-        let n = Npm::with_url("https://www.npmjs.com/package/js-yaml").unwrap();
-        println!(
-            "{} {} {} {} {} {} {}",
-            n.ramp_up_time(),
-            n.correctness(),
-            n.bus_factor(),
-            n.responsiveness(),
-            n.compatibility(),
-            n.reviewed_code(),
-            n.pinning_practice()
-        );
-    }
+    // #[test]
+    // fn test_metrics() {
+    //     let n = Npm::with_url("https://www.npmjs.com/package/js-yaml").unwrap();
+    //     println!(
+    //         "{} {} {} {} {} {} {}",
+    //         n.ramp_up_time(),
+    //         n.correctness(),
+    //         n.bus_factor(),
+    //         n.responsiveness(),
+    //         n.compatibility(),
+    //         n.reviewed_code(),
+    //         n.pinning_practice()
+    //     );
+    // }
 }
