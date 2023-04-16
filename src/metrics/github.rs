@@ -297,9 +297,13 @@ impl Metrics for Github {
                 package_url = content.url; 
             } 
         }
-        // ADD IN BAD REQUEST HERE
-
-        let client = reqwest::blocking::Client::builder()
+        
+        // In case of no package.json file -> make 0 to not effect score
+        let mut pinning_practice_score = 0.0 as f64;
+        if package_url.is_empty() { 
+            pinning_practice_score = 0.0;
+        } else {
+            let client = reqwest::blocking::Client::builder()
             .user_agent("ECE461Project")
             .build();
         let response = client.unwrap().get(package_url).send();
@@ -335,10 +339,6 @@ impl Metrics for Github {
                     }
                 }
 
-                //let mut decoded_content_dict = PyDict::new(py);
-                //let dictionary_obj = py.eval(&edited_decoded_content_string, None, None).unwrap();
-                //let dictionary_py = dictionary_obj.extract::<&PyDict>().unwrap();
-
                 let dict_py_json: serde_json::Value = serde_json::from_str(&edited_decoded_content_string).unwrap();
                 let dev_dependencies = dict_py_json["devDependencies"].as_object().unwrap();
                 let dev_dependencies_vals = dev_dependencies.values().cloned().collect::<Vec<_>>();
@@ -348,7 +348,8 @@ impl Metrics for Github {
             num_dependencies = 0.0;
         }
 
-        let pinning_practice_score = if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}; 
+        pinning_practice_score = if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}; 
+        }
 
         pinning_practice_score
     }
@@ -453,15 +454,22 @@ impl Metrics for Github {
     //     assert!(g.reviewed_code() <= 0.5);
     // }
 
-    // #[test]
-    // fn pinning_one_half() {
-    //     let g = Github::with_url("https://github.com/nodeca/js-yaml").unwrap();
-    //     assert!(g.responsiveness() == 0.5);
-    // }
+    // testing pinningPractice metric 
+    #[test]
+    fn pinning_zero() {
+        let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
+        assert_eq!(0.0, g.pinning_practice());
+    }
 
-    // #[test]
-    // fn pinning_zero() {
-    //     let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
-    //     assert!(g.responsiveness() == 1.0);
-    // }
+    #[test]
+    fn pinning_zero_point_one() {
+        let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
+        assert_eq!(0.1, g.pinning_practice());
+    }
+
+    #[test]
+    fn pinning_one_half() {
+        let g = Github::with_url("https://github.com/stefanbuck/peer-version-check").unwrap();
+        assert_eq!(0.5, g.pinning_practice());
+    }
 
