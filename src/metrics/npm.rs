@@ -28,7 +28,7 @@ impl Npm {
             .and_then(|value| value.as_str());
 
         // dereference the url so we can use .replace() later
-        let derefurl = giturl.as_deref()?;
+        let derefurl = giturl?;
 
         // Do not need to check if url contains git+, just do replace. That would take care of it
         let derefurl = derefurl.replace("git+", "");
