@@ -104,7 +104,7 @@ impl Github {
 
     // GitHub GraphQL API
     pub fn graphql(&self, query: String) -> reqwest::Result<reqwest::blocking::Response> {
-        let github_token = std::env::var("GITHUB_TOKEN").unwrap().to_string();
+        let github_token = std::env::var("GITHUB_TOKEN").unwrap();
 
         self.client
             .post("https://api.github.com/graphql")
@@ -295,7 +295,7 @@ impl Metrics for Github {
         let response = client.unwrap().get(package_url).send();
 
         let mut num_dependencies = 0.0;
-        if let Some(response) = response.ok() {
+        if let Ok(response) = response {
             let body_string = response.text().unwrap();
             let body_json_string: PinningPracticePackageJSON = serde_json::from_str(&body_string).unwrap();
             let content_string = body_json_string.content.unwrap();
