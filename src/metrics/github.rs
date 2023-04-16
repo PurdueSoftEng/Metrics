@@ -4,9 +4,8 @@ use log::{debug, info};
 use reqwest::header;
 use statrs::distribution::{ContinuousCDF, Normal};
 use std::io::BufRead;
-use pyo3::{prelude::*, types::PyMapping};
-use pyo3::types::PyDict;
-use serde::{Deserialize, Serialize};
+use pyo3::{prelude::*};
+use serde::{Deserialize};
 
 #[derive(Debug)]
 pub struct Github {
@@ -27,30 +26,10 @@ struct GithubPinningPractice {
 
 #[derive(Debug, Deserialize)]
 struct PinningPracticePackageJSON {
-    name: String,
-    path: String,
-    sha: String,
-    size: u64,
-    url: String,
-    html_url: String,
-    git_url: String,
-    download_url: String,
     #[serde(rename = "type")]
-    file_type: String,
-    content: Option<String>,
-    encoding: String, 
-    _links: Links,
+    content: Option<String>
 }
 
-#[derive(Debug, Deserialize)]
-struct Links {
-    #[serde(rename = "self")]
-    self_link: String,
-    #[serde(rename = "html")]
-    html_link: String,
-    #[serde(rename = "git")]
-    git_link: String,
-}
 
 impl Github {
     // create new instance with url
@@ -125,9 +104,11 @@ impl Github {
 
     // GitHub GraphQL API
     pub fn graphql(&self, query: String) -> reqwest::Result<reqwest::blocking::Response> {
+        let github_token = std::env::var("GITHUB_TOKEN").unwrap();
+
         self.client
             .post("https://api.github.com/graphql")
-            .bearer_auth(format!("{}", std::env::var("GITHUB_TOKEN").unwrap()))
+            .bearer_auth(github_token)
             .body(query)
             .send()
     }
@@ -143,12 +124,7 @@ impl Github {
         let response = self.rest_api(path)?;
         let header = response.headers().get("link");
         if header.is_none() {
-            if response
-                .json::<serde_json::Value>()?
-                .as_array()
-                .unwrap()
-                .len()
-                != 0
+            if !response.json::<serde_json::Value>()?.as_array().unwrap().is_empty()
             {
                 return Ok(1);
             } else {
@@ -176,7 +152,7 @@ impl Metrics for Github {
         info!("repository cloned");
 
         // Check if there is readme
-        let file = match std::fs::File::open(&format!("{}/README.md", path_name)) {
+        let file = match std::fs::File::open(format!("{}/README.md", path_name)) {
             Ok(file) => file,
             Err(_) => {
                 std::fs::remove_dir_all(repo_path).unwrap();
@@ -223,7 +199,7 @@ impl Metrics for Github {
         // calculate the score for bus factor
         let score: f64 = ((2.0 * collaborators as f64) / (collaborators as f64 + 1.0)) - 1.0;
         debug!("bus_factor_score: {:.2}", score);
-        return score;
+        score
     }
 
     fn responsiveness(&self) -> f64 {
@@ -255,7 +231,7 @@ impl Metrics for Github {
             return 0.0;
         }
 
-        let result = Self::calc_compatibility(&license.unwrap());
+        let result = Self::calc_compatibility(license.unwrap());
         debug!("license_score: {:.2}", result);
         result
     }
@@ -265,23 +241,37 @@ impl Metrics for Github {
         info!("calculating reviewed_code_score");
 
         let json = self.graph_json(
-            format!("{{\"query\" : \"query {{ repository(owner: \\\"{}\\\", name: \\\"{}\\\") {{ pullRequests(states: [OPEN, CLOSED], first: 100, orderBy: {{field: CREATED_AT, direction: DESC}}) {{ edges {{ node {{ number additions, number deletions, reviews(first: 1) {{ totalCount }} }} }} }} }} }}\" }}", self.owner, self.repo))
-            .unwrap();
+            format!(
+                "{{\"query\":\"query {{ repository(owner: \\\"{}\\\", name: \\\"{}\\\") {{ pullRequests(first: 100, orderBy: {{field: CREATED_AT, direction: DESC}}) {{ edges {{ node {{ number additions, number deletions }} }} }} }} }}\" }}",
+                self.owner, self.repo
+            )
+        ).unwrap();
 
-        let mut reviewed_pull_count = 0;
         let pulls = json["data"]["repository"]["pullRequests"]["edges"].as_array().unwrap();
+        //println!("numpulls = {}", pulls.len());
 
-        for pull in pulls {
-            let reviews = &pull["node"]["reviews"]["totalCount"];
-            reviewed_pull_count += 1;
+        let reviewsjson = self.graph_json(
+            format!(
+                "{{\"query\":\"query {{ repository(owner: \\\"{}\\\", name: \\\"{}\\\") {{ pullRequests(first: 100, orderBy: {{field: CREATED_AT, direction: DESC}}) {{ edges {{ node {{ number additions, number deletions, reviews(first: 1) {{ totalCount }} }} }} }} }} }}\" }}",
+                self.owner, self.repo
+            )
+        ).unwrap();
+
+        let reviewed_pulls = reviewsjson["data"]["repository"]["pullRequests"]["edges"].as_array().unwrap();
+
+        let mut reviewed_pulls_count = 0;
+
+        for pull in reviewed_pulls {
+            //println!("pull = {}", pull);
+            let reviews = pull["node"]["reviews"]["totalCount"].as_i64();
+            if reviews.unwrap_or(0) > 0 {
+                reviewed_pulls_count += 1;
+            }
         }
-
-        let reviewed_code_score = reviewed_pull_count / pulls.len();
-        // println!("numpulls = {}", pulls.len());
-        // println!("numreviewed = {}", reviewed_pull_count);
-        // println!("reviewed code score = {}", reviewed_code_score);
-        reviewed_code_score as f64
+        //println!("reviewed code score = {}", reviewed_code_score);
+        reviewed_pulls_count as f64 / pulls.len() as f64
     }
+
 
     fn pinning_practice(&self) -> f64 {
         // use github api to get dependency count
@@ -309,7 +299,7 @@ impl Metrics for Github {
         let response = client.unwrap().get(package_url).send();
 
         let mut num_dependencies = 0.0;
-        if let Some(response) = response.ok() {
+        if let Ok(response) = response {
             let body_string = response.text().unwrap();
             let body_json_string: PinningPracticePackageJSON = serde_json::from_str(&body_string).unwrap();
             let content_string = body_json_string.content.unwrap();
@@ -347,7 +337,6 @@ impl Metrics for Github {
         } else {
             num_dependencies = 0.0;
         }
-
         pinning_practice_score = if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}; 
         }
 

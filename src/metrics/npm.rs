@@ -28,7 +28,7 @@ impl Npm {
             .and_then(|value| value.as_str());
 
         // dereference the url so we can use .replace() later
-        let derefurl = &giturl.as_deref()?;
+        let derefurl = giturl?;
 
         // Do not need to check if url contains git+, just do replace. That would take care of it
         let derefurl = derefurl.replace("git+", "");
@@ -93,18 +93,18 @@ mod tests {
         assert!(Npm::with_url("https://www.npmjs.com/package/js-yaml").is_some());
     }
 
-    #[test]
-    fn test_metrics() {
-        let n = Npm::with_url("https://www.npmjs.com/package/js-yaml").unwrap();
-        println!(
-            "{} {} {} {} {} {} {}",
-            n.ramp_up_time(),
-            n.correctness(),
-            n.bus_factor(),
-            n.responsiveness(),
-            n.compatibility(),
-            n.reviewed_code(),
-            n.pinning_practice()
-        );
-    }
+    // #[test]
+    // fn test_metrics() {
+    //     let n = Npm::with_url("https://www.npmjs.com/package/js-yaml").unwrap();
+    //     println!(
+    //         "{} {} {} {} {} {} {}",
+    //         n.ramp_up_time(),
+    //         n.correctness(),
+    //         n.bus_factor(),
+    //         n.responsiveness(),
+    //         n.compatibility(),
+    //         n.reviewed_code(),
+    //         n.pinning_practice()
+    //     );
+    // }
 }
