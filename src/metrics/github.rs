@@ -104,9 +104,11 @@ impl Github {
 
     // GitHub GraphQL API
     pub fn graphql(&self, query: String) -> reqwest::Result<reqwest::blocking::Response> {
+        let github_token = std::env::var("GITHUB_TOKEN").unwrap().to_string();
+
         self.client
             .post("https://api.github.com/graphql")
-            .bearer_auth(format!("{}", std::env::var("GITHUB_TOKEN").unwrap().to_string()))
+            .bearer_auth(github_token)
             .body(query)
             .send()
     }
@@ -229,7 +231,7 @@ impl Metrics for Github {
             return 0.0;
         }
 
-        let result = Self::calc_compatibility(&license.unwrap());
+        let result = Self::calc_compatibility(license.unwrap());
         debug!("license_score: {:.2}", result);
         result
     }
@@ -266,11 +268,8 @@ impl Metrics for Github {
                 reviewed_pulls_count += 1;
             }
         }
-        
-        let reviewed_code_score = reviewed_pulls_count as f64 / pulls.len() as f64;
         //println!("reviewed code score = {}", reviewed_code_score);
-
-        reviewed_code_score
+        reviewed_pulls_count as f64 / pulls.len() as f64
     }
 
 
@@ -339,9 +338,7 @@ impl Metrics for Github {
             num_dependencies = 0.0;
         }
 
-        let pinning_practice_score = if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}; 
-
-        pinning_practice_score
+        if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}
     }
 }
 
