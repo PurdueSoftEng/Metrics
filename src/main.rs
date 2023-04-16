@@ -49,12 +49,12 @@ fn main() -> Result<(), String> {
         let fp = std::env::var("LOG_FILE")
             .ok()
             .and_then(|i| std::fs::File::create(i).ok());
-        if fp.is_none() {
-            // turn off loggin gif log file not found
-            filter = LevelFilter::Off;
-            env_logger::fmt::Target::Stderr // can be anything
+        if let Some(fp) = fp {
+            env_logger::fmt::Target::Pipe(Box::new(fp))
         } else {
-            env_logger::fmt::Target::Pipe(Box::new(fp.unwrap()))
+            // Turn off logging if log file is not found
+            filter = LevelFilter::Off;
+            env_logger::fmt::Target::Stderr // Can be anything
         }
     };
 

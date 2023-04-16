@@ -3,8 +3,7 @@
 if [ -e "log/test.log" ]; then
     rm log/test.log
 fi
-cargo test --tests --bin tool > log/test.log 2>&1
-
+GITHUB_TOKEN="${{ secrets.TEAM_GITHUB_TOKEN }}" ./run tests/url.txt > log/test.log 2>&1
 
 if [ $? -eq 0 ]; then
   passed=$(cat log/test.log | grep -o "ok. [0-9]* passed;" | sed 's/ok. \([0-9]*\) passed;/\1/')
