@@ -106,7 +106,7 @@ impl Github {
     pub fn graphql(&self, query: String) -> reqwest::Result<reqwest::blocking::Response> {
         self.client
             .post("https://api.github.com/graphql")
-            .bearer_auth(format!("{}", std::env::var("GITHUB_TOKEN").unwrap()))
+            .bearer_auth(format!("{}", std::env::var("GITHUB_TOKEN").unwrap().to_string()))
             .body(query)
             .send()
     }
@@ -122,12 +122,7 @@ impl Github {
         let response = self.rest_api(path)?;
         let header = response.headers().get("link");
         if header.is_none() {
-            if response
-                .json::<serde_json::Value>()?
-                .as_array()
-                .unwrap()
-                .len()
-                != 0
+            if !response.json::<serde_json::Value>()?.as_array().unwrap().is_empty()
             {
                 return Ok(1);
             } else {
@@ -155,7 +150,7 @@ impl Metrics for Github {
         info!("repository cloned");
 
         // Check if there is readme
-        let file = match std::fs::File::open(&format!("{}/README.md", path_name)) {
+        let file = match std::fs::File::open(format!("{}/README.md", path_name)) {
             Ok(file) => file,
             Err(_) => {
                 std::fs::remove_dir_all(repo_path).unwrap();
