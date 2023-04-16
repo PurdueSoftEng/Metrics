@@ -26,30 +26,10 @@ struct GithubPinningPractice {
 
 #[derive(Debug, Deserialize)]
 struct PinningPracticePackageJSON {
-    // name: String,
-    // path: String,
-    // sha: String,
-    // size: u64,
-    // url: String,
-    // html_url: String,
-    // git_url: String,
-    // download_url: String,
     #[serde(rename = "type")]
-    // file_type: String,
-    content: Option<String>,
-    // encoding: String, 
-    _links: Links,
+    content: Option<String>
 }
 
-#[derive(Debug, Deserialize)]
-struct Links {
-    #[serde(rename = "self")]
-    self_link: String,
-    #[serde(rename = "html")]
-    html_link: String,
-    #[serde(rename = "git")]
-    git_link: String,
-}
 
 impl Github {
     // create new instance with url
@@ -222,7 +202,7 @@ impl Metrics for Github {
         // calculate the score for bus factor
         let score: f64 = ((2.0 * collaborators as f64) / (collaborators as f64 + 1.0)) - 1.0;
         debug!("bus_factor_score: {:.2}", score);
-        return score;
+        score
     }
 
     fn responsiveness(&self) -> f64 {
