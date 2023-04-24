@@ -32,6 +32,7 @@ struct PinningPracticePackageJSON {
 
 
 impl Github {
+    #[allow(dead_code)]
     // create new instance with url
     pub fn with_url(url: &str) -> Option<Github> {
         let u = reqwest::Url::parse(url).ok()?;
