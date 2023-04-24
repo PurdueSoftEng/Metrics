@@ -7,6 +7,7 @@ pub struct Npm {
 }
 
 impl Npm {
+    #[allow(dead_code)]
     pub fn with_url(url: &str) -> Option<Npm> {
         let npm_url = url.replace(
             "https://www.npmjs.com/package/",

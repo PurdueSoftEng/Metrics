@@ -10,7 +10,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-
+#[allow(dead_code)]
 fn calcscore(f: &String) -> Result<(), String> {
     let mut net_scores = Vec::new();
 
