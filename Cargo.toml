@@ -1,5 +1,5 @@
 [package]
-name = "ece461_team19_cli"
+name = "metrics"
 version = "0.1.0"
 edition = "2021"
 
