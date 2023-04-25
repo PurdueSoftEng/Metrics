@@ -9,67 +9,56 @@ use std::{
     collections::HashMap,
     io::{BufRead, BufReader},
 };
+use std::env;
 
 #[allow(dead_code)]
-fn calcscore(f: &String) -> Result<(), String> {
+fn calcscore(url: &String) -> Result<(), String> {
     let mut net_scores = Vec::new();
 
-    let file = std::fs::File::open(f).map_err(|e| format!("{}", e))?;
-    let reader = BufReader::new(file);
+    info!("exploring {}", url);
 
-    for line in reader.lines() {
-        let line = line.unwrap();
-        if line.is_empty() {
-            continue;
+    // if type is github or npm
+    if let Some(domain) = reqwest::Url::parse(&url)
+        .map_err(|_| format!("{} is not a url", url))?
+        .domain()
+    {
+        let project: Box<dyn Metrics>;
+        // if github
+        if domain == "github.com" {
+            project = Box::new(
+                Github::with_url(&url)
+                    .ok_or(format!("Error while processing url: {}", &url))?,
+            );
+        } else if domain == "www.npmjs.com" {
+            project = Box::new(
+                Npm::with_url(&url).ok_or(format!("Error while processing url: {}", &url))?,
+            );
         }
-        info!("exploring {}", line);
 
-        // if type is github or npm
-        if let Some(domain) = reqwest::Url::parse(&line)
-            .map_err(|_| format!("{} is not a url", line))?
-            .domain()
-        {
-            let project: Box<dyn Metrics>;
-            // if github
-            if domain == "github.com" {
-                project = Box::new(
-                    Github::with_url(&line)
-                        .ok_or(format!("Error while processing url: {}", &line))?,
-                );
-            } else if domain == "www.npmjs.com" {
-                project = Box::new(
-                    Npm::with_url(&line).ok_or(format!("Error while processing url: {}", &line))?,
-                );
-            } else {
-                continue;
-            }
-            // calculate score
-            info!("calculating score");
-            let mut net_score = HashMap::new();
-            let ramp_up: f64 = project.ramp_up_time();
-            let correctness: f64 = project.correctness();
-            let bus_factor: f64 = project.bus_factor();
-            let responsiveness: f64 = project.responsiveness();
-            let compatibility: f64 = project.compatibility();
-            let reviewed_code: f64 = project.reviewed_code();
-            let score: f64 = ramp_up * 0.05
-                + correctness * 0.1
-                + bus_factor * 0.1
-                + responsiveness * 0.25
-                + compatibility * 0.4
-                + reviewed_code * 0.2;
-            net_score.insert("URL", line);
-            net_score.insert("NET_SCORE", score.to_string());
-            net_score.insert("RAMP_UP_SCORE", ramp_up.to_string());
-            net_score.insert("CORRECTNESS_SCORE", correctness.to_string());
-            net_score.insert("BUS_FACTOR_SCORE", bus_factor.to_string());
-            net_score.insert("RESPONSIVE_MAINTAINER_SCORE", responsiveness.to_string());
-            net_score.insert("REVIEWED_CODE_SCORE", reviewed_code.to_string());
-            net_score.insert("LICENSE_SCORE", compatibility.to_string());
-            net_scores.push(net_score);
-        } else {
-            continue;
-        }
+        // calculate score
+        info!("calculating score");
+        let mut net_score = HashMap::new();
+        let ramp_up: f64 = project.ramp_up_time();
+        let correctness: f64 = project.correctness();
+        let bus_factor: f64 = project.bus_factor();
+        let responsiveness: f64 = project.responsiveness();
+        let compatibility: f64 = project.compatibility();
+        let reviewed_code: f64 = project.reviewed_code();
+        let score: f64 = ramp_up * 0.05
+            + correctness * 0.1
+            + bus_factor * 0.1
+            + responsiveness * 0.25
+            + compatibility * 0.4
+            + reviewed_code * 0.2;
+        net_score.insert("URL", url);
+        net_score.insert("NET_SCORE", score.to_string());
+        net_score.insert("RAMP_UP_SCORE", ramp_up.to_string());
+        net_score.insert("CORRECTNESS_SCORE", correctness.to_string());
+        net_score.insert("BUS_FACTOR_SCORE", bus_factor.to_string());
+        net_score.insert("RESPONSIVE_MAINTAINER_SCORE", responsiveness.to_string());
+        net_score.insert("REVIEWED_CODE_SCORE", reviewed_code.to_string());
+        net_score.insert("LICENSE_SCORE", compatibility.to_string());
+        net_scores.push(net_score);
     }
     // sort by net scores
     info!("sorting by net scores");

@@ -247,27 +247,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fea41bba32d969b513997752735605054bc0dfa92b4c56bf1189f2e174be7a10"
 
 [[package]]
-name = "ece461_team19_cli"
-version = "0.1.0"
-dependencies = [
- "assert_cmd",
- "base64",
- "bytes",
- "chrono",
- "clap",
- "dict",
- "env_logger",
- "git2",
- "hyper",
- "log",
- "pyo3",
- "reqwest",
- "serde",
- "serde_json",
- "statrs",
-]
-
-[[package]]
 name = "either"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -780,6 +759,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d61c719bcfbcf5d62b3a09efa6088de8c54bc0bfcd3ea7ae39fcc186108b8de1"
 dependencies = [
  "autocfg",
+]
+
+[[package]]
+name = "metrics"
+version = "0.1.0"
+dependencies = [
+ "assert_cmd",
+ "base64",
+ "bytes",
+ "chrono",
+ "clap",
+ "dict",
+ "env_logger",
+ "git2",
+ "hyper",
+ "log",
+ "pyo3",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "statrs",
 ]
 
 [[package]]
