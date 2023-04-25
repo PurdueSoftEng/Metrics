@@ -3,9 +3,9 @@ mod metrics;
 
 use clap::{Parser, Subcommand};
 use log::{debug, info, LevelFilter};
-use metrics::github::Github;
-use metrics::npm::Npm;
-use metrics::Metrics;
+use crate::metrics::github::Github;
+use crate::metrics::npm::Npm;
+use crate::metrics::Metrics;
 use std::io::Write;
 use std::{
     collections::HashMap,

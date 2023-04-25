@@ -3,8 +3,8 @@
 # exit on error
 set -e
 
-EXE="./target/debug/ece461_team19_cli"
-RELEASE_EXE="./target/release/ece461_team19_cli"
+EXE="./target/debug/metrics"
+RELEASE_EXE="./target/release/metrics"
 
 # check for existing llvm tools
 if [ -x "$(command -v llvm-cov-14)" ]; then
