@@ -1,6 +1,4 @@
-# Project Title
-
-Team 12's CLI Tool Implementation for Part 2
+# Team 12's CLI Tool Implementation for Part 2
 
 ## Implementation from Handoff with Team 19
 ### Implemented from ECE461_Team19_CLI
@@ -33,6 +31,15 @@ For Part 2 of the project we implemented two new metrics.
 
 ### New Metric #1: Good Pinning Practice
 
+The metric tests the fraction of dependencies that are pinned to at least a specific major+minor vesion of a package. 
+
 ### New Metric #2: Code Review
+
+## Updating the Repository
+
+For part 2 we also updated our Github repository to be both binary and library. To incorporate a connection with our REST-ful API,
+we set up the Github as a library with the addition of a lib.rs file. 
+
+
 
 
