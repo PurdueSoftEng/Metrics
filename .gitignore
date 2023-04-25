@@ -5,3 +5,4 @@
 /*.profraw
 /*.profdata
 /.IS_ECEPROG
+Cargo.lock
