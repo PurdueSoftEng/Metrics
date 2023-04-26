@@ -143,14 +143,17 @@ fn calcscore(f: &String) -> Result<(), String> {
             .unwrap();
         handle
             .write_fmt(format_args!(
-                "\"LICENSE_SCORE\":{}}}\n",
-                dict.get("LICENSE_SCORE").unwrap().parse::<f64>().unwrap()
+                "\"PINNING_PRACTICE_SCORE\":{:.2}, ",
+                dict.get("PINNING_PRACTICE_SCORE")
+                    .unwrap()
+                    .parse::<f64>()
+                    .unwrap()
             ))
             .unwrap();
         handle
             .write_fmt(format_args!(
-                "\"PINNING_PRACTICE\":{}}}\n",
-                dict.get("PINNING_PRACTICE_SCORE").unwrap().parse::<f64>().unwrap()
+                "\"LICENSE_SCORE\":{}}}\n",
+                dict.get("LICENSE_SCORE").unwrap().parse::<f64>().unwrap()
             ))
             .unwrap();
     }
