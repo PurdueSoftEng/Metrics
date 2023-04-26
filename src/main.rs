@@ -74,7 +74,7 @@ fn main() -> Result<(), String> {
     let cli = Cli::parse();
     match &cli.command {
         //Commands::Url { url_file: f } => calcscore(f)?, //println!("url: {:?}", f),
-        Commands::Url { url_file: f } => calcscore_url(&url.to_string())?, //println!("url: {:?}", f),
+        Commands::Url { url_file: _f } => calcscore_url(&url.to_string())?, //println!("url: {:?}", f),
         Commands::Report {
             test_result: t,
             line_analysis: l,
@@ -94,6 +94,7 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
+#[allow(dead_code)]
 fn calcscore(f: &String) -> Result<(), String> {
     let mut net_scores = Vec::new();
 
