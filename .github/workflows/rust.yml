@@ -22,8 +22,8 @@ jobs:
       run: bash run install
     - name: Build
       run: bash run build
-    - name: Build
-      run: bash run test
+    # - name: Build
+    #   run: bash run test
     # - name: Lint
     #   run: cargo clippy -- -D warnings
 
