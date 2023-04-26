@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>ECE 461 Final Project</title>
+    <style>
+      /* Style the font of the header */
+      h1 {
+        font-size: 36px; /* Change the font size to 36px */
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        margin-top: 10px; /* Add some margin to the top */
+        margin-bottom: 10px; /* Add some margin to the bottom */
+        text-align: center; /* Center the text */
+      }
+      
+      /* Style the logo */
+      #logo {
+        display: block; /* Set the display property to block */
+        margin: 0 auto; /* Center the image horizontally */
+        width: 100px; /* Set the width to 100px */
+        height: 100px; /* Set the height to 100px */
+      }
+      
+      /* Style the header container */
+      header {
+        text-align: center; /* Center the header text */
+      }
+      label, input {
+        font-size: 24px; /* Change the font size to 24px or any other size you prefer */
+        font-family: "Comic Sans MS", cursive, sans-serif; /* Change the font family to Comic Sans */
+      }
+      body {
+        background-color: #bfefff; /* Change the color to light blue */
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>ECE 461 Final Project</h1> <!-- Add the header -->
+    </header>
+    <img id="logo" src="purdueLogo.png" alt="Computer Cartoon"> <!-- Add the logo -->
+    <form action="#" method="post" enctype="multipart/form-data">
+      <label for="file">Select a zipped file to upload:</label>
+      <input type="file" name="file" id="file"><br><br>
+      <input type="submit" value="Upload File"><br><br>
+    </form>
+    <form action="#" method="get">
+      <label for="search">Search our database:</label>
+      <input type="text" name="search" id="search"><br><br>
+      <input type="submit" value="Submit">
+    </form>
+  </body>
+</html>
