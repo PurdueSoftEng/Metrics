@@ -63,7 +63,7 @@ elif [[ "$1" == "test" ]]; then
 
     # run tests
     RUSTFLAGS="-C instrument-coverage" cargo build --target-dir="test_target"
-    RUSTFLAGS="-C instrument-coverage" cargo test --tests --message-format=json --no-run ece461_team19_cli > cargo_test.out
+    RUSTFLAGS="-C instrument-coverage" cargo test --tests --message-format=json --no-run metrics > cargo_test.out
     grep '"executable":".*/deps/' cargo_test.out | sed 's/.*"executable":"\([^"]*\)".*/\1/' > test_exes.txt
     while IFS="" read -r line
     do
@@ -82,7 +82,7 @@ elif [[ "$1" == "test" ]]; then
                     printf "%s %s " "--object" $line; \
                 done < test_exes.txt \
             ) \
-            --object ./test_target/debug/ece461_team19_cli \
+            --object ./test_target/debug/metrics \
             --instr-profile=line_result.profdata \
             --ignore-filename-regex=/.cargo/registry \
             --ignore-filename-regex=/rustc
@@ -94,7 +94,7 @@ elif [[ "$1" == "test" ]]; then
                 printf "%s %s " "--object" $line; \
             done < test_exes.txt \
         ) \
-        --object ./test_target/debug/ece461_team19_cli \
+        --object ./test_target/debug/metrics \
         --instr-profile=line_result.profdata \
         --ignore-filename-regex=/.cargo/registry \
         --ignore-filename-regex=/rustc \
