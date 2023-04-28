@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -58,16 +60,23 @@
       <h1>ECE 461 Final Project</h1> <!-- Add the header -->
     </header>
     <img id="logo" src="purdueLogo.png" alt="Computer Cartoon"> <!-- Add the logo -->
-    <form action="#" method="post" enctype="multipart/form-data">
+    <form action="https://tool-app-6x33ng5huq-uc.a.run.app/group" method="post" enctype="multipart/form-data">
       <label for="file">Select a zipped file to upload:</label>
       <input type="file" name="file" id="file"><br><br>
       <input type="submit" value="Upload File"><br><br>
     </form>
-    <form action="#" method="get">
+    <!-- <form action="https://tool-app-6x33ng5huq-uc.a.run.app/package" method="post">
+      <label for="search">Search our database:</label>
+      <input type="text" name="search" id="search"><br><br>
+      <input type="submit" value="Submit">
+    </form> -->
+    <form action="https://tool-app-6x33ng5huq-uc.a.run.app/group" method="get">
+      <input type="hidden" name="search" value="">
       <label for="search">Search our database:</label>
       <input type="text" name="search" id="search"><br><br>
       <input type="submit" value="Submit">
     </form>
+
     <footer>
       <div style="width:1240px;height:0;padding-bottom:200px;position:relative;"><iframe src="https://giphy.com/embed/MT5UUV1d4CXE2A37Dg" width=200px height=200px style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div><p><a href="https://giphy.com/gifs/Giflytics-MT5UUV1d4CXE2A37Dg"></a></p>
     </footer>
@@ -83,7 +92,7 @@
         formData.append("file", file);
         
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "https://tool-app-6x33ng5huq-uc.a.run.app/", true);
+        xhr.open("POST", "https://tool-app-6x33ng5huq-uc.a.run.app/group", true);
         xhr.onload = function() {
           if (xhr.status === 200) {
             console.log(xhr.responseText);
@@ -91,22 +100,26 @@
         };
         xhr.send(formData);
       }
-      
+ 
       function searchDatabase() {
         event.preventDefault(); // prevent the form from submitting
-        
+  
         var searchInput = document.getElementById("search");
         var searchQuery = searchInput.value;
-        
+  
+        var formData = new FormData();
+        formData.append("search", searchQuery);
+  
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "https://tool-app-6x33ng5huq-uc.a.run.app/" + searchQuery, true);
+        xhr.open("GET", "https://tool-app-6x33ng5huq-uc.a.run.app/group", true);
         xhr.onload = function() {
           if (xhr.status === 200) {
             var response = JSON.parse(xhr.responseText);
             console.log(response);
           }
         };
-      }
+        xhr.send(formData);
+}
     </script>
   </body>
 </html>
