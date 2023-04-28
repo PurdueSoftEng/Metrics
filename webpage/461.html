@@ -71,6 +71,43 @@
     <footer>
       <div style="width:1240px;height:0;padding-bottom:200px;position:relative;"><iframe src="https://giphy.com/embed/MT5UUV1d4CXE2A37Dg" width=200px height=200px style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div><p><a href="https://giphy.com/gifs/Giflytics-MT5UUV1d4CXE2A37Dg"></a></p>
     </footer>
+
+    <script>
+      function uploadFile() {
+        event.preventDefault(); // prevent the form from submitting
+        
+        var fileInput = document.getElementById("file");
+        var file = fileInput.files[0];
+        
+        var formData = new FormData();
+        formData.append("file", file);
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://tool-app-6x33ng5huq-uc.a.run.app/", true);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            console.log(xhr.responseText);
+          }
+        };
+        xhr.send(formData);
+      }
+      
+      function searchDatabase() {
+        event.preventDefault(); // prevent the form from submitting
+        
+        var searchInput = document.getElementById("search");
+        var searchQuery = searchInput.value;
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://tool-app-6x33ng5huq-uc.a.run.app/" + searchQuery, true);
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            console.log(response);
+          }
+        };
+      }
+    </script>
   </body>
 </html>
 
