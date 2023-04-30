@@ -15,9 +15,9 @@ use std::fs::File;
 pub fn calcscore(url: String) -> Result<(), String> {
     let mut net_scores = Vec::new();
 
-    let mut f = File::create("/src/url.txt").expect("Unable to create file");
+    let mut f = File::create("./src/url.txt").expect("Unable to create file");
     f.write_all(url.as_bytes()).expect("Unable to write data to file");
-    let file_path = "/src/url.txt";
+    let file_path = "./src/url.txt";
 
     let file = std::fs::File::open(file_path).map_err(|e| format!("{}", e))?;
     let reader = BufReader::new(file);
