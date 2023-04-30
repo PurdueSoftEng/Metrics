@@ -12,7 +12,7 @@ use std::{
 use std::fs::File;
 
 #[allow(dead_code)]
-fn calcscore(url: String) -> Result<(), String> {
+pub fn calcscore(url: String) -> Result<(), String> {
     let mut net_scores = Vec::new();
 
     let mut f = File::create("/src/url.txt").expect("Unable to create file");
