@@ -25,4 +25,4 @@ compiler_builtins = "0.1.91"
 
 [lib]
 name = "metricslib"
-crate-type = ["dylib"]
+crate-type = ["cdylib"]
