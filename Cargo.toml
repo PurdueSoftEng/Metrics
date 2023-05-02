@@ -21,7 +21,7 @@ base64 = "0.21.0"
 hyper = {version = "0.14", features = ["full"]}
 pyo3 = "0.18.2"
 dict = "0.1.5"
-compiler_builtins = "1.1.0"
+compiler_builtins = "0.1.91"
 
 [lib]
 name = "metricslib"
