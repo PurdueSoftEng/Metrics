@@ -24,4 +24,4 @@ dict = "0.1.5"
 
 [lib]
 name = "metricslib"
-crate-type = ["dylib"]
+crate-type = ["cdylib"]
