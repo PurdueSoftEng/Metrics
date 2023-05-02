@@ -12,33 +12,17 @@ env:
   RUST_BACKTRACE: 1
   LOG_FILE: log/logfile.txt
   LOG_LEVEL: 1
-  PYO3_CROSS_PYTHON_VERSION: 3.8
-  CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_DEBUG: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: Set Rust toolchain to nightly
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: nightly
     - name: Install
       run: bash run install
-    - name: Add Rust target
-      run: rustup target add x86_64-pc-windows-msvc
-    - name: Cargo Build for Python Implementation
-      run: cargo build --release --target x86_64-pc-windows-msvc
-    - name: DLL for Python Implementation
-      run: cargo rustc --lib --release --target x86_64-pc-windows-msvc -- -C link-args="/DLL /IMPLIB:my_lib.lib"
     - name: Build
       run: bash run build
-    - name: Cargo Test for Python Implementation
-      run: cargo test --release --target x86_64-pc-windows-msvc
     - name: Test
       run: bash run test
     - name: Lint
       run: cargo clippy -- -D warnings
-
