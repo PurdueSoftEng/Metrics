@@ -17,16 +17,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        target: x86_64-pc-windows-msvc
     - uses: actions/checkout@v3
     - name: Install
       run: bash run install
     - name: Cargo Build for Python Implementation
       run: cargo build --release --target x86_64-pc-windows-msvc
+    - name: DLL for Python Implementation
+      run: cargo rustc --lib --release --target x86_64-pc-windows-msvc -- -C link-args="/DLL /IMPLIB:my_lib.lib"
     - name: Build
       run: bash run build
     - name: Cargo Test for Python Implementation
