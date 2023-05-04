@@ -2,9 +2,10 @@ mod file_parser;
 mod metrics;
 
 use std::fs::File;
+use std::fs;
 use clap::{Parser, Subcommand};
 use log::{debug, info, LevelFilter};
-use crate::metrics::github::Github;
+use crate::metrics::github::{Github, get_name, get_version};
 use crate::metrics::npm::Npm;
 use crate::metrics::Metrics;
 use std::io::Write;
@@ -68,7 +69,7 @@ fn main() -> Result<(), String> {
     info!("print info");
     debug!("print debug");
 
-    let url = "https://github.com/PurdueSoftEng/CLI-Tool";
+    let url = "https://github.com/cloudinary/cloudinary_npm";
 
     // parse command line arguments
     let cli = Cli::parse();
@@ -233,12 +234,20 @@ fn calcscore(f: &String) -> Result<(), String> {
 }
 
 fn calcscore_url(url: &String) -> Result<(), String> {
+    println!("CALCSCORE_URL IS BEING USED");
     let mut net_scores = Vec::new();
 
-    let mut f = File::create("/src/url.txt").expect("Unable to create file");
-    f.write_all(url.as_bytes()).expect("Unable to write data to file");
-    let file_path = "/src/url.txt";
+    let file_path = "./src/url.txt";
 
+    if let Err(e) = fs::remove_file(file_path) {
+        if e.kind() != std::io::ErrorKind::NotFound {
+            // If the error is not "file not found", return an error
+            return Err(format!("Failed to remove file {}: {}", file_path, e));
+        }
+    }
+
+    let mut f = File::create(file_path).expect("Unable to create file");
+    f.write_all(url.as_bytes()).expect("Unable to write data to file");
     let file = std::fs::File::open(file_path).map_err(|e| format!("{}", e))?;
     let reader = BufReader::new(file);
 
@@ -382,5 +391,12 @@ fn calcscore_url(url: &String) -> Result<(), String> {
             ))
             .unwrap();
     }
+
+    let owner = get_name(url);
+    println!("Owner: {}", owner);
+    let version = get_version(url);
+    println!("Version: {}", version);
+
+
     Ok(())
 }
