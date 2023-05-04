@@ -288,9 +288,13 @@ impl Metrics for Github {
                 package_url = content.url; 
             } 
         }
-        // ADD IN BAD REQUEST HERE
-
-        let client = reqwest::blocking::Client::builder()
+        
+        // In case of no package.json file -> make 0 to not effect score
+        let mut pinning_practice_score = 0.0 as f64;
+        if package_url.is_empty() { 
+            pinning_practice_score = 0.0;
+        } else {
+            let client = reqwest::blocking::Client::builder()
             .user_agent("ECE461Project")
             .build();
         let response = client.unwrap().get(package_url).send();
@@ -334,8 +338,10 @@ impl Metrics for Github {
         } else {
             num_dependencies = 0.0;
         }
+        pinning_practice_score = if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}; 
+        }
 
-        if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}
+        pinning_practice_score
     }
 }
 
@@ -490,3 +496,21 @@ pub fn get_version(url: &String) -> String{
         assert!(g.responsiveness() == 1.0);
     }
 
+   // testing pinningPractice metric 
+   #[test]
+   fn pinning_zero() {
+       let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
+       assert_eq!(0.0, g.pinning_practice());
+   }
+
+   #[test]
+   fn pinning_zero_point_one() {
+       let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
+       assert_eq!(0.1, g.pinning_practice());
+   }
+
+   #[test]
+   fn pinning_one_half() {
+       let g = Github::with_url("https://github.com/stefanbuck/peer-version-check").unwrap();
+       assert_eq!(0.5, g.pinning_practice());
+   }

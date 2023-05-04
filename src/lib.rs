@@ -12,8 +12,10 @@ use std::{
     io::{BufRead, BufReader},
 };
 use std::fs::File;
+use pyo3::prelude::*;
 
 #[allow(dead_code)]
+#[pyfunction]
 pub fn calcscore(url: String) -> Result<(), String> {
     let mut net_scores = Vec::new();
     let file_path = "./src/url.txt";
@@ -172,5 +174,11 @@ pub fn calcscore(url: String) -> Result<(), String> {
             ))
             .unwrap();
     }
+    Ok(())
+}
+
+#[pymodule]
+fn metrticslib(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(calcscore, m)?)?;
     Ok(())
 }

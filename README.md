@@ -40,7 +40,7 @@ This metric tests the fraction of project code that was introduced through pull 
 ## Updating the Repository
 
 For part 2 we also updated our Github repository to be both a binary and library. To incorporate a connection with our REST-ful API,
-we set up the Github as a library with the addition of a lib.rs file. 
+we set up the Github as a library with the addition of a lib.rs file. For use with the Python Flask API we created a submodule in a new repository to access the library.
 
 
 
