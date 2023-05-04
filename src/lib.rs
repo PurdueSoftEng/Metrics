@@ -194,15 +194,15 @@ pub fn calcscore_py(url: &str) -> PyResult<(String)> {
     let bus_factor: f64 = project.bus_factor();
     let responsiveness: f64 = project.responsiveness();
     let compatibility: f64 = project.compatibility();
-    //let reviewed_code: f64 = project.reviewed_code();
-    //let pinning_practice = project.pinning_practice();
+    let reviewed_code: f64 = project.reviewed_code();
+    let pinning_practice = project.pinning_practice();
     let score: f64 = ramp_up * 0.05
         + correctness * 0.1
         + bus_factor * 0.1
         + responsiveness * 0.25
-        + compatibility * 0.4;
-        //+ reviewed_code * 0.2
-        //+ pinning_practice * 0.1
+        + compatibility * 0.4
+        + reviewed_code * 0.2
+        + pinning_practice * 0.1;
     /*net_score.insert("URL", url);
     net_score.insert("NET_SCORE", score.to_string());
     net_score.insert("RAMP_UP_SCORE", ramp_up.to_string());
@@ -213,7 +213,7 @@ pub fn calcscore_py(url: &str) -> PyResult<(String)> {
     net_score.insert("LICENSE_SCORE", compatibility.to_string());
     net_score.insert("PINNING_PRACTICE_SCORE", pinning_practice.to_string());
     net_scores.push(net_score);*/
-    let val = serde_json::json!({"ramp_up": ramp_up, "correctness": correctness, "bus_factor": bus_factor, "responsiveness": responsiveness, "compatibility": compatibility});
+    let val = serde_json::json!({"ramp_up": ramp_up, "correctness": correctness, "bus_factor": bus_factor, "responsiveness": responsiveness, "compatibility": compatibility, "reviewed_code": reviewed_code, "pinning_practice": pinning_practice});
     Ok(val.to_string())
 }
 
@@ -230,6 +230,6 @@ mod tests {
     #[test]
     fn check_score() {
         let score: PyResult<(String)> = calcscore_py("https://github.com/nodeca/js-yaml");
-        assert_eq!("hello".to_string(), score.unwrap());
+        assert_eq!("{\"bus_factor\":0.9736842105263157,\"compatibility\":1.0,\"correctness\":0.9168278529980658,\"pinning_practice\":0.0,\"ramp_up\":0.8435521107801185,\"responsiveness\":0.17798355988273015,\"reviewed_code\":0.16}".to_string(), score.unwrap());
     }
 }

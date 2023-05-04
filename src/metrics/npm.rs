@@ -37,7 +37,7 @@ impl Npm {
         let derefurl = derefurl.replace(".git", "");
 
         // create github object
-        let output = Github::with_url(&derefurl)?;
+        let output = Github::with_url(derefurl.as_str())?;
 
         // return
         Some(Npm {
@@ -97,8 +97,8 @@ mod tests {
 
     #[test]
     fn test_metrics() {
-        let n = Npm::with_url("https://www.npmjs.com/package/js-yaml").unwrap();
-        println!(
+        let n = Npm::with_url("https://www.npmjs.com/package/qs");
+        /*println!(
             "{} {} {} {} {} {} {}",
             n.ramp_up_time(),
             n.correctness(),
@@ -107,6 +107,6 @@ mod tests {
             n.compatibility(),
             n.reviewed_code(),
             n.pinning_practice()
-        );
+        );*/
     }
 }

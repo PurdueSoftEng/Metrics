@@ -6,3 +6,4 @@
 /*.profdata
 /.IS_ECEPROG
 Cargo.lock
+.venv/
