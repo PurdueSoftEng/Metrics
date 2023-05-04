@@ -339,13 +339,27 @@ impl Metrics for Github {
     }
 }
 
+#[allow(dead_code)]
 pub fn get_name(url: &String) -> String{
-    let git = Github::with_url(url).ok_or(format!("Error while processing url: {}", url)).unwrap();
+    let git = match Github::with_url(url) {
+        Some(git) => git,
+        None => {
+            println!("Error while processing url: {}", url);
+            return String::from("None");
+        }
+    };
     return git.owner;
 }
 
+#[allow(dead_code)]
 pub fn get_version(url: &String) -> String{
-    let git = Github::with_url(url).ok_or(format!("Error while processing url: {}", url)).unwrap();
+    let git = match Github::with_url(url) {
+        Some(git) => git,
+        None => {
+            println!("Error while processing url: {}", url);
+            return String::from("0.0.0");
+        }
+    };
 
     let json = git.graph_json(
         format!(
