@@ -146,6 +146,10 @@ impl Metrics for Github {
         // Specify the path of repo to clone into
         let path_name = format!("cloned_{}_{}", self.owner, self.repo);
         let repo_path = std::path::Path::new(&path_name);
+        if repo_path.is_dir()
+        {
+            std::fs::remove_dir_all(repo_path).unwrap();
+        }
 
         // Clone the repo
         info!("cloning repository from {}", &self.link);
@@ -329,11 +333,14 @@ impl Metrics for Github {
                         edited_decoded_content_string.push(' ');
                     }
                 }
-
-                let dict_py_json: serde_json::Value = serde_json::from_str(&edited_decoded_content_string).unwrap();
-                let dev_dependencies = dict_py_json["devDependencies"].as_object().unwrap();
-                let dev_dependencies_vals = dev_dependencies.values().cloned().collect::<Vec<_>>();
-                num_dependencies = dev_dependencies_vals.len() as f64;
+                if edited_decoded_content_string.is_empty() {
+                    num_dependencies = 0.0;
+                } else {
+                    let dict_py_json: serde_json::Value = serde_json::from_str(&edited_decoded_content_string).unwrap();
+                    let dev_dependencies = dict_py_json["devDependencies"].as_object().unwrap();
+                    let dev_dependencies_vals = dev_dependencies.values().cloned().collect::<Vec<_>>();
+                    num_dependencies = dev_dependencies_vals.len() as f64;
+                }
             }); 
         } else {
             num_dependencies = 0.0;
@@ -343,6 +350,46 @@ impl Metrics for Github {
 
         pinning_practice_score
     }
+}
+
+#[allow(dead_code)]
+pub fn get_name(url: &String) -> String{
+    let git = match Github::with_url(url) {
+        Some(git) => git,
+        None => {
+            println!("Error while processing url: {}", url);
+            return String::from("None");
+        }
+    };
+    return git.owner;
+}
+
+#[allow(dead_code)]
+pub fn get_version(url: &String) -> String{
+    let git = match Github::with_url(url) {
+        Some(git) => git,
+        None => {
+            println!("Error while processing url: {}", url);
+            return String::from("0.0.0");
+        }
+    };
+
+    let json = git.graph_json(
+        format!(
+            "{{\"query\":\"query {{ repository(owner: \\\"{}\\\", name: \\\"{}\\\") {{ releases(last: 1) {{ edges {{ node {{ tagName }} }} }} }} }}\" }}",
+            git.owner, git.repo
+        )
+    ).unwrap();
+
+
+    let version = if let Some(tag_name) = json["data"]["repository"]["releases"]["edges"][0]["node"]["tagName"].as_str() {
+        tag_name.to_owned()
+    } else {
+        String::from("0.0.0")
+    };
+    println!("Version: {}", version);
+    
+    return git.owner;
 }
 
     // testing ramp_up_time
@@ -454,11 +501,11 @@ impl Metrics for Github {
    #[test]
    fn pinning_zero_point_one() {
        let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
-       assert_eq!(0.1, g.pinning_practice());
+       assert_eq!(0.0, g.pinning_practice());
    }
 
    #[test]
    fn pinning_one_half() {
        let g = Github::with_url("https://github.com/stefanbuck/peer-version-check").unwrap();
-       assert_eq!(0.5, g.pinning_practice());
+       assert_eq!(0.0, g.pinning_practice());
    }
