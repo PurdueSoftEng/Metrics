@@ -1,6 +1,7 @@
 use crate::metrics::github::Github;
 use crate::metrics::Metrics;
 use serde_json::Value; // for parsing json
+use pyo3::prelude::*;
 
 pub struct Npm {
     gh: Box<dyn Metrics>,
@@ -94,18 +95,18 @@ mod tests {
         assert!(Npm::with_url("https://www.npmjs.com/package/js-yaml").is_some());
     }
 
-    // #[test]
-    // fn test_metrics() {
-    //     let n = Npm::with_url("https://www.npmjs.com/package/js-yaml").unwrap();
-    //     println!(
-    //         "{} {} {} {} {} {} {}",
-    //         n.ramp_up_time(),
-    //         n.correctness(),
-    //         n.bus_factor(),
-    //         n.responsiveness(),
-    //         n.compatibility(),
-    //         n.reviewed_code(),
-    //         n.pinning_practice()
-    //     );
-    // }
+    #[test]
+    fn test_metrics() {
+        let n = Npm::with_url("https://www.npmjs.com/package/js-yaml").unwrap();
+        println!(
+            "{} {} {} {} {} {} {}",
+            n.ramp_up_time(),
+            n.correctness(),
+            n.bus_factor(),
+            n.responsiveness(),
+            n.compatibility(),
+            n.reviewed_code(),
+            n.pinning_practice()
+        );
+    }
 }

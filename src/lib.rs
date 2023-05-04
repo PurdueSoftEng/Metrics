@@ -10,10 +10,14 @@ use std::{
     io::{BufRead, BufReader},
 };
 use std::fs::File;
+use regex::Regex;
 use pyo3::prelude::*;
+use pyo3::exceptions::PyTypeError;
+use serde_json;
+use serde;
+
 
 #[allow(dead_code)]
-#[pyfunction]
 pub fn calcscore(url: String) -> Result<(), String> {
     let mut net_scores = Vec::new();
 
@@ -45,7 +49,8 @@ pub fn calcscore(url: String) -> Result<(), String> {
                 );
             } else if domain == "www.npmjs.com" {
                 project = Box::new(
-                    Npm::with_url(&line).ok_or(format!("Error while processing url: {}", &line))?,
+                    Npm::with_url(&line)
+                        .ok_or(format!("Error while processing url: {}", &line))?,
                 );
             } else {
                 continue;
@@ -167,8 +172,64 @@ pub fn calcscore(url: String) -> Result<(), String> {
     Ok(())
 }
 
+#[allow(dead_code)]
+#[pyfunction]
+pub fn calcscore_py(url: &str) -> PyResult<(String)> {
+    //let mut net_scores = Vec::new();
+
+    // let domain = reqwest::Url::parse(&url)?..domain().unwrap();
+    // if type is github or npm
+    let mut project: Box<dyn Metrics>;
+    // if github
+    if Regex::new(r"https://github.com/?").unwrap().captures(url).is_some() {
+        project = Box::new(Github::with_url(url).unwrap());
+    } else {
+        project = Box::new(Npm::with_url(url).unwrap());
+    }
+    // calculate score
+    info!("calculating score");
+    //let mut net_score = HashMap::new();
+    let ramp_up: f64 = project.ramp_up_time();
+    let correctness: f64 = project.correctness();
+    let bus_factor: f64 = project.bus_factor();
+    let responsiveness: f64 = project.responsiveness();
+    let compatibility: f64 = project.compatibility();
+    //let reviewed_code: f64 = project.reviewed_code();
+    //let pinning_practice = project.pinning_practice();
+    let score: f64 = ramp_up * 0.05
+        + correctness * 0.1
+        + bus_factor * 0.1
+        + responsiveness * 0.25
+        + compatibility * 0.4;
+        //+ reviewed_code * 0.2
+        //+ pinning_practice * 0.1
+    /*net_score.insert("URL", url);
+    net_score.insert("NET_SCORE", score.to_string());
+    net_score.insert("RAMP_UP_SCORE", ramp_up.to_string());
+    net_score.insert("CORRECTNESS_SCORE", correctness.to_string());
+    net_score.insert("BUS_FACTOR_SCORE", bus_factor.to_string());
+    net_score.insert("RESPONSIVE_MAINTAINER_SCORE", responsiveness.to_string());
+    net_score.insert("REVIEWED_CODE_SCORE", reviewed_code.to_string());
+    net_score.insert("LICENSE_SCORE", compatibility.to_string());
+    net_score.insert("PINNING_PRACTICE_SCORE", pinning_practice.to_string());
+    net_scores.push(net_score);*/
+    let val = serde_json::json!({"ramp_up": ramp_up, "correctness": correctness, "bus_factor": bus_factor, "responsiveness": responsiveness, "compatibility": compatibility});
+    Ok(val.to_string())
+}
+
 #[pymodule]
-fn metrticslib(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(calcscore, m)?)?;
+fn metricslib(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(calcscore_py, m)?)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn check_score() {
+        let score: PyResult<(String)> = calcscore_py("https://github.com/nodeca/js-yaml");
+        assert_eq!("hello".to_string(), score.unwrap());
+    }
 }

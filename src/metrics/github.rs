@@ -435,22 +435,22 @@ impl Metrics for Github {
         assert!(g.compatibility() == 0.0);
     }
 
-    // //testing reviewed code metric
-    // #[test]
-    // fn test_reveiwed_code() {
-    //     let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
-    //     assert!(g.reviewed_code() <= 0.5);
-    // }
+    //testing reviewed code metric
+    #[test]
+    fn test_reveiwed_code() {
+        let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
+        assert!(g.reviewed_code() <= 0.5);
+    }
 
-    // #[test]
-    // fn pinning_one_half() {
-    //     let g = Github::with_url("https://github.com/nodeca/js-yaml").unwrap();
-    //     assert!(g.responsiveness() == 0.5);
-    // }
+    #[test]
+    fn pinning_one_half() {
+        let g = Github::with_url("https://github.com/nodeca/js-yaml").unwrap();
+        assert!(g.responsiveness() == 0.5);
+    }
 
-    // #[test]
-    // fn pinning_zero() {
-    //     let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
-    //     assert!(g.responsiveness() == 1.0);
-    // }
+    #[test]
+    fn pinning_zero() {
+        let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
+        assert!(g.responsiveness() == 1.0);
+    }
 
