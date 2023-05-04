@@ -326,10 +326,6 @@ impl Metrics for Github {
                     }
                 }
 
-                //let mut decoded_content_dict = PyDict::new(py);
-                //let dictionary_obj = py.eval(&edited_decoded_content_string, None, None).unwrap();
-                //let dictionary_py = dictionary_obj.extract::<&PyDict>().unwrap();
-
                 let dict_py_json: serde_json::Value = serde_json::from_str(&edited_decoded_content_string).unwrap();
                 let dev_dependencies = dict_py_json["devDependencies"].as_object().unwrap();
                 let dev_dependencies_vals = dev_dependencies.values().cloned().collect::<Vec<_>>();
@@ -341,6 +337,32 @@ impl Metrics for Github {
 
         if num_dependencies == 0.0 {1.0} else {1.0 / num_dependencies}
     }
+}
+
+pub fn get_name(url: &String) -> String{
+    let git = Github::with_url(url).ok_or(format!("Error while processing url: {}", url)).unwrap();
+    return git.owner;
+}
+
+pub fn get_version(url: &String) -> String{
+    let git = Github::with_url(url).ok_or(format!("Error while processing url: {}", url)).unwrap();
+
+    let json = git.graph_json(
+        format!(
+            "{{\"query\":\"query {{ repository(owner: \\\"{}\\\", name: \\\"{}\\\") {{ releases(last: 1) {{ edges {{ node {{ tagName }} }} }} }} }}\" }}",
+            git.owner, git.repo
+        )
+    ).unwrap();
+
+
+    let version = if let Some(tag_name) = json["data"]["repository"]["releases"]["edges"][0]["node"]["tagName"].as_str() {
+        tag_name.to_owned()
+    } else {
+        String::from("0.0.0")
+    };
+    println!("Version: {}", version);
+    
+    return git.owner;
 }
 
     // testing ramp_up_time
@@ -435,22 +457,22 @@ impl Metrics for Github {
         assert!(g.compatibility() == 0.0);
     }
 
-    // //testing reviewed code metric
-    // #[test]
-    // fn test_reveiwed_code() {
-    //     let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
-    //     assert!(g.reviewed_code() <= 0.5);
-    // }
+    //testing reviewed code metric
+    #[test]
+    fn test_reveiwed_code() {
+        let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
+        assert!(g.reviewed_code() <= 0.5);
+    }
 
-    // #[test]
-    // fn pinning_one_half() {
-    //     let g = Github::with_url("https://github.com/nodeca/js-yaml").unwrap();
-    //     assert!(g.responsiveness() == 0.5);
-    // }
+    #[test]
+    fn pinning_one_half() {
+        let g = Github::with_url("https://github.com/nodeca/js-yaml").unwrap();
+        assert!(g.responsiveness() == 0.5);
+    }
 
-    // #[test]
-    // fn pinning_zero() {
-    //     let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
-    //     assert!(g.responsiveness() == 1.0);
-    // }
+    #[test]
+    fn pinning_zero() {
+        let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
+        assert!(g.responsiveness() == 1.0);
+    }
 

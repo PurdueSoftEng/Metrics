@@ -1,7 +1,9 @@
 mod file_parser;
 mod metrics;
 use log::info;
+use std::fs;
 use crate::metrics::github::Github;
+pub use crate::metrics::github::get_name;
 use crate::metrics::npm::Npm;
 use crate::metrics::Metrics;
 use std::io::Write;
@@ -14,6 +16,14 @@ use std::fs::File;
 #[allow(dead_code)]
 pub fn calcscore(url: String) -> Result<(), String> {
     let mut net_scores = Vec::new();
+    let file_path = "./src/url.txt";
+
+    if let Err(e) = fs::remove_file(file_path) {
+        if e.kind() != std::io::ErrorKind::NotFound {
+            // If the error is not "file not found", return an error
+            return Err(format!("Failed to remove file {}: {}", file_path, e));
+        }
+    }
 
     let mut f = File::create("./src/url.txt").expect("Unable to create file");
     f.write_all(url.as_bytes()).expect("Unable to write data to file");
