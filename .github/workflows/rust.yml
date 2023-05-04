@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Maturin
+      run: cargo install maturin
     - name: Install
       run: bash run install
     - name: Build

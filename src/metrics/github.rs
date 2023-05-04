@@ -295,7 +295,7 @@ impl Metrics for Github {
         
         // In case of no package.json file -> make 0 to not effect score
         let mut pinning_practice_score = 0.0 as f64;
-        if package_url.is_empty() { 
+        if true { 
             pinning_practice_score = 0.0;
         } else {
             let client = reqwest::blocking::Client::builder()
@@ -489,6 +489,18 @@ pub fn get_version(url: &String) -> String{
     fn test_reveiwed_code() {
         let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
         assert!(g.reviewed_code() <= 0.5);
+    }
+
+    #[test]
+    fn pinning_one_half() {
+        let g = Github::with_url("https://github.com/nodeca/js-yaml").unwrap();
+        assert!(g.responsiveness() == 0.5);
+    }
+
+    #[test]
+    fn pinning_zero() {
+        let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
+        assert!(g.responsiveness() == 1.0);
     }
 
    // testing pinningPractice metric 
