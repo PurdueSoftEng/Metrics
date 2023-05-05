@@ -333,11 +333,14 @@ impl Metrics for Github {
                         edited_decoded_content_string.push(' ');
                     }
                 }
-
-                let dict_py_json: serde_json::Value = serde_json::from_str(&edited_decoded_content_string).unwrap();
-                let dev_dependencies = dict_py_json["devDependencies"].as_object().unwrap();
-                let dev_dependencies_vals = dev_dependencies.values().cloned().collect::<Vec<_>>();
-                num_dependencies = dev_dependencies_vals.len() as f64;
+                if edited_decoded_content_string.is_empty() {
+                    num_dependencies = 0.0;
+                } else {
+                    let dict_py_json: serde_json::Value = serde_json::from_str(&edited_decoded_content_string).unwrap();
+                    let dev_dependencies = dict_py_json["devDependencies"].as_object().unwrap();
+                    let dev_dependencies_vals = dev_dependencies.values().cloned().collect::<Vec<_>>();
+                    num_dependencies = dev_dependencies_vals.len() as f64;
+                }
             }); 
         } else {
             num_dependencies = 0.0;
