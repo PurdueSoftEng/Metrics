@@ -5,7 +5,7 @@ use std::fs::File;
 use std::fs;
 use clap::{Parser, Subcommand};
 use log::{debug, info, LevelFilter};
-use crate::metrics::github::{Github, get_name, get_version};
+use crate::metrics::github::Github;
 use crate::metrics::npm::Npm;
 use crate::metrics::Metrics;
 use std::io::Write;
@@ -392,10 +392,10 @@ fn calcscore_url(url: &String) -> Result<(), String> {
             .unwrap();
     }
 
-    let owner = get_name(url);
+    /*let owner = get_name(url);
     println!("Owner: {}", owner);
     let version = get_version(url);
-    println!("Version: {}", version);
+    println!("Version: {}", version);*/
 
 
     Ok(())

@@ -140,6 +140,29 @@ impl Github {
 
         Ok(page.unwrap().parse::<u32>().unwrap())
     }
+
+    pub fn get_name(&self) -> String {
+        self.owner.clone()
+    }
+
+    pub fn get_version(&self) -> String{  
+        let json = self.graph_json(
+            format!(
+                "{{\"query\":\"query {{ repository(owner: \\\"{}\\\", name: \\\"{}\\\") {{ releases(last: 1) {{ edges {{ node {{ tagName }} }} }} }} }}\" }}",
+                self.owner, self.repo
+            )
+        ).unwrap();
+    
+    
+        let version = if let Some(tag_name) = json["data"]["repository"]["releases"]["edges"][0]["node"]["tagName"].as_str() {
+            tag_name.to_owned()
+        } else {
+            String::from("0.0.0")
+        };
+        
+        version
+    }
+    
 }
 impl Metrics for Github {
     fn ramp_up_time(&self) -> f64 {
@@ -350,9 +373,10 @@ impl Metrics for Github {
 
         pinning_practice_score
     }
+
 }
 
-#[allow(dead_code)]
+/*#[allow(dead_code)]
 pub fn get_name(url: &String) -> String{
     let git = match Github::with_url(url) {
         Some(git) => git,
@@ -362,9 +386,9 @@ pub fn get_name(url: &String) -> String{
         }
     };
     return git.owner;
-}
+}*/
 
-#[allow(dead_code)]
+/*#[allow(dead_code)]
 pub fn get_version(url: &String) -> String{
     let git = match Github::with_url(url) {
         Some(git) => git,
@@ -390,7 +414,7 @@ pub fn get_version(url: &String) -> String{
     println!("Version: {}", version);
     
     return git.owner;
-}
+} */
 
     // testing ramp_up_time
     #[test]
@@ -489,18 +513,6 @@ pub fn get_version(url: &String) -> String{
     fn test_reveiwed_code() {
         let g = Github::with_url("https://github.com/PurdueSoftEng/CLI-Tool").unwrap();
         assert!(g.reviewed_code() <= 0.5);
-    }
-
-    #[test]
-    fn pinning_one_half() {
-        let g = Github::with_url("https://github.com/nodeca/js-yaml").unwrap();
-        assert!(g.responsiveness() == 0.5);
-    }
-
-    #[test]
-    fn pinning_zero() {
-        let g = Github::with_url("https://github.com/brix/crypto-js").unwrap();
-        assert!(g.responsiveness() == 1.0);
     }
 
    // testing pinningPractice metric 

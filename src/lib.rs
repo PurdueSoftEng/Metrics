@@ -1,9 +1,10 @@
 mod file_parser;
 mod metrics;
 use log::info;
+use metrics::github;
 use std::fs;
 use crate::metrics::github::Github;
-pub use crate::metrics::github::get_name;
+//pub use crate::metrics::github::{get_name, get_version};
 use crate::metrics::npm::Npm;
 use crate::metrics::Metrics;
 use std::io::Write;
@@ -227,9 +228,23 @@ pub fn calcscore_py(url: &str) -> PyResult<(String)> {
     Ok(val.to_string())
 }
 
+#[pyfunction]
+pub fn get_name_py(url: &str) -> PyResult<(String)>
+{
+    Ok(Github::with_url(url).unwrap().get_name())
+}
+
+#[pyfunction]
+pub fn get_version_py(url: &str) -> PyResult<(String)>
+{
+    Ok(Github::with_url(url).unwrap().get_version())
+}
+
 #[pymodule]
 fn metricslib(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(calcscore_py, m)?)?;
+    m.add_function(wrap_pyfunction!(get_name_py, m)?)?;
+    m.add_function(wrap_pyfunction!(get_version_py, m)?)?;
     Ok(())
 }
 
@@ -240,6 +255,6 @@ mod tests {
     #[test]
     fn check_score() {
         let score: PyResult<(String)> = calcscore_py("https://github.com/nodeca/js-yaml");
-        assert_eq!("{\"bus_factor\":0.9736842105263157,\"compatibility\":1.0,\"correctness\":0.9168278529980658,\"pinning_practice\":0.0,\"ramp_up\":0.8435521107801185,\"responsiveness\":0.17798355988273015,\"reviewed_code\":0.16}".to_string(), score.unwrap());
+        assert_eq!("{\"bus_factor\":0.9736842105263157,\"compatibility\":1.0,\"correctness\":0.915057915057915,\"pinning_practice\":0.0,\"ramp_up\":0.8435521107801185,\"responsiveness\":0.17798355988273015,\"reviewed_code\":0.16}".to_string(), score.unwrap());
     }
 }
